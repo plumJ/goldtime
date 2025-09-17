@@ -1,11 +1,11 @@
-# jenkins 本地部署 MAC M1
+# Jenkins 本地部署 MAC M1
 
-## jenkins network
+## Jenkins network
 ```bash
     docker network create jenkins-net
 ```
 
-## jenkins master
+## Jenkins master
 
 ### docker run
 ```bash
@@ -18,7 +18,7 @@ docker run -d \
     jenkins/jenkins:lts-jdk17
 ```
 
-## jenkins agent
+## Jenkins agent
 
 ### docker build
 ```bash
