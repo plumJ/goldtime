@@ -1,6 +1,14 @@
+# jenkins 本地部署 MAC M1
+
+## jenkins network
+```bash
+    docker network create jenkins-net
+```
+
 ## jenkins master
 
-# docker run
+### docker run
+```bash
 docker run -d \
     --name jenkins \
     --network jenkins-net \
@@ -8,13 +16,17 @@ docker run -d \
     -p 50000:50000 \
     -v jenkins_home:/var/jenkins_home  \
     jenkins/jenkins:lts-jdk17
+```
 
 ## jenkins agent
 
-# docker build
+### docker build
+```bash
 docker build -t jenkins-docker-agent -f Dockerfile.agent .
+```
 
-# docker run
+### docker run
+```bash
 docker run -d \
   --name jenkins-docker-agent \
   --network jenkins-net \
@@ -25,3 +37,4 @@ docker run -d \
   -e JENKINS_AGENT_WORKDIR=/home/jenkins/agent \
   -e JENKINS_SECRET=e7df6a2f86e750d8deaa08ec2728d1bf49d90f9160534bcff776c9052f91480b \
   jenkins-docker-agent
+```
