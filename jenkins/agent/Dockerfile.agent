@@ -1,0 +1,25 @@
+FROM jenkins/inbound-agent:latest
+
+USER root
+
+# 安装必要工具
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 下载并安装 Docker CLI (ARM64 版本)
+RUN curl -fsSL https://download.docker.com/linux/static/stable/aarch64/docker-24.0.7.tgz -o docker.tgz && \
+    tar -xzf docker.tgz && \
+    mv docker/docker /usr/local/bin/ && \
+    rm -rf docker docker.tgz && \
+    chmod +x /usr/local/bin/docker
+
+# 验证安装
+RUN docker --version
+
+# 添加到 docker 组
+RUN groupadd -f docker && \
+    usermod -aG docker jenkins
+
+USER jenkins
