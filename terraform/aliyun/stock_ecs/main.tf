@@ -24,6 +24,7 @@ resource "alicloud_instance" "i-8vb2h5z76r6ypx90jpl6" {
         "sg-8vbi4cl2cvhcrzkhl9z2",
     ]
     system_disk_category                = "cloud_essd"
+    system_disk_size                    = 40
     internet_max_bandwidth_out          = 0
     renewal_status                     = "AutoRenewal"
     auto_renew_period                  = 12
