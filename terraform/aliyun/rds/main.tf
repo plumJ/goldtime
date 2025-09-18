@@ -12,6 +12,11 @@ provider "alicloud" {
   region = "cn-hangzhou"
 }
 
+# 查询现有资源组信息
+data "alicloud_resource_manager_resource_groups" "groups" {
+  name_regex = "GoldTime"  # 根据资源组名称过滤
+}
+
 # 使用现有的VPC和VSwitch
 data "alicloud_vpcs" "existing" {
   ids = ["vpc-bp1vtn5sob59pxuxy8tg3"]
@@ -31,6 +36,12 @@ resource "alicloud_db_instance" "goldtime-rds-instance-a" {
   instance_charge_type = "Postpaid"  # 按量付费，可选Prepaid（包年包月）
   vswitch_id           = "vsw-bp1jnpj5imdvo790bz0nf"
   security_ips         = ["10.1.0.0/20", "10.1.16.0/20", "10.1.32.0/20"]
+
+  # 指定资源组 - 方式一：直接使用已知的资源组ID
+  resource_group_id = "rg-aek3b5tr2l3v4ci"  # 替换为 GoldTime 资源组的实际ID
+  
+  # 或者方式二：使用数据源查询到的资源组ID（取消注释下面这行，注释掉上面那行）
+  # resource_group_id = data.alicloud_resource_manager_resource_groups.groups.groups[0].id
   
   parameters {
     name  = "connect_timeout"
