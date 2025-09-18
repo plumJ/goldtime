@@ -50,17 +50,17 @@ resource "alicloud_db_instance" "goldtime-rds-instance-a" {
 }
 
 # 创建数据库账号
-resource "alicloud_db_account" "mysql_db_account" {
+resource "alicloud_db_account" "goldtime-rds-instance-a-account" {
   db_instance_id      = alicloud_db_instance.goldtime-rds-instance-a.id
-  account_name        = "mysql_db_account"
+  account_name        = "goldtime-rds-instance-a-account"
   account_password    = "12345678XT!DB"  # 请修改为强密码
   account_type        = "Normal"
 }
 
 # 创建数据库
-resource "alicloud_db_database" "goldtime-rds-instance-a-db1" {
+resource "alicloud_db_database" "go_gin_api" {
   instance_id   = alicloud_db_instance.goldtime-rds-instance-a.id
-  name          = "goldtime-rds-instance-a-db1"
+  name          = "go_gin_api"
   character_set = "utf8mb4"
   description   = "GoldTime database"
 }
@@ -69,8 +69,8 @@ resource "alicloud_db_database" "goldtime-rds-instance-a-db1" {
 output "rds_connection" {
   value = {
     endpoint = alicloud_db_instance.goldtime-rds-instance-a.connection_string
-    username = alicloud_db_account.mysql_db_account.name
-    database = alicloud_db_database.goldtime-rds-instance-a-db1.name
+    username = alicloud_db_account.goldtime-rds-instance-a-account.name
+    database = alicloud_db_database.go_gin_api.name
   }
   sensitive = true
 }
