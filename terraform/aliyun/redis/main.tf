@@ -65,19 +65,19 @@ resource "alicloud_kvstore_instance" "goldtime-kv-instance-a" {
 
 # 输出实例信息
 output "redis_instance_id" {
-  value = alicloud_kvstore_instance.kv_instance.id
+  value = alicloud_kvstore_instance.goldtime-kv-instance-a.id
 }
 
 output "redis_connection_domain" {
-  value = alicloud_kvstore_instance.kv_instance.connection_domain
+  value = alicloud_kvstore_instance.goldtime-kv-instance-a.connection_domain
 }
 
 output "redis_port" {
-  value = alicloud_kvstore_instance.kv_instance.port
+  value = alicloud_kvstore_instance.goldtime-kv-instance-a.port
 }
 
 output "redis_status" {
-  value = alicloud_kvstore_instance.kv_instance.status
+  value = alicloud_kvstore_instance.goldtime-kv-instance-a.status
 }
 
 # 输出资源组信息（用于验证）
