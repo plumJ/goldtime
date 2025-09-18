@@ -36,25 +36,49 @@ resource "alicloud_db_instance" "goldtime-rds-instance-a" {
   instance_charge_type = "Postpaid"  # 按量付费，可选Prepaid（包年包月）
   vswitch_id           = "vsw-bp1jnpj5imdvo790bz0nf"
   security_ips         = ["10.1.0.0/20", "10.1.16.0/20", "10.1.32.0/20"]
+  zone_id              = "cn-hangzhou-k"  # 明确指定可用区
 
-  # 指定资源组 - 方式一：直接使用已知的资源组ID
-  resource_group_id = "rg-aek3b5tr2l3v4ci"  # 替换为 GoldTime 资源组的实际ID
-  
-  # 或者方式二：使用数据源查询到的资源组ID（取消注释下面这行，注释掉上面那行）
-  # resource_group_id = data.alicloud_resource_manager_resource_groups.groups.groups[0].id
-  
+  # 指定资源组
+  resource_group_id = "rg-aek3b5tr2l3v4ci"
+
+  # 重要：配置超时时间
+  timeouts {
+    create = "60m"  # RDS创建通常需要较长时间
+    update = "30m"
+  }
+
+  # 明确依赖关系
+  depends_on = [
+    data.alicloud_vpcs.existing,
+    data.alicloud_vswitches.existing
+  ]
+
+  # 数据库参数配置
   parameters {
     name  = "connect_timeout"
     value = "60"
+  }
+  
+  parameters {
+    name  = "interactive_timeout"
+    value = "28800"
+  }
+  
+  parameters {
+    name  = "wait_timeout"
+    value = "28800"
   }
 }
 
 # 创建数据库账号
 resource "alicloud_db_account" "goldtime-rds-instance-a-account" {
   db_instance_id      = alicloud_db_instance.goldtime-rds-instance-a.id
-  account_name        = "goldtime-rds-instance-a-account"
+  account_name        = "goldtime_rds_instance_a_account"
   account_password    = "12345678XT!DB"  # 请修改为强密码
   account_type        = "Normal"
+  
+  # 等待实例完全创建完成
+  depends_on = [alicloud_db_instance.goldtime-rds-instance-a]
 }
 
 # 创建数据库
@@ -63,13 +87,19 @@ resource "alicloud_db_database" "go_gin_api" {
   name          = "go_gin_api"
   character_set = "utf8mb4"
   description   = "GoldTime database"
+  
+  # 等待实例和账号创建完成
+  depends_on = [
+    alicloud_db_instance.goldtime-rds-instance-a,
+    alicloud_db_account.goldtime-rds-instance-a-account
+  ]
 }
 
 # 输出连接信息
 output "rds_connection" {
   value = {
     endpoint = alicloud_db_instance.goldtime-rds-instance-a.connection_string
-    username = alicloud_db_account.goldtime-rds-instance-a-account.name
+    username = alicloud_db_account.goldtime-rds-instance-a-account.account_name
     database = alicloud_db_database.go_gin_api.name
   }
   sensitive = true
@@ -91,5 +121,11 @@ output "rds_instance_info" {
     instance_name = alicloud_db_instance.goldtime-rds-instance-a.instance_name
     engine        = alicloud_db_instance.goldtime-rds-instance-a.engine
     engine_version = alicloud_db_instance.goldtime-rds-instance-a.engine_version
+    status        = alicloud_db_instance.goldtime-rds-instance-a.status
   }
+}
+
+# 输出实例状态用于调试
+output "rds_status" {
+  value = alicloud_db_instance.goldtime-rds-instance-a.status
 }
